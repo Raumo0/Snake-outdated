@@ -15,7 +15,7 @@ public class MenuState extends State {
     public MenuState(GameStateManager gsm) {
         super(gsm);
         camera.setToOrtho(false, GameMain.WIDTH / 2, GameMain.HEIGHT / 2);
-        background = new Texture("bg.png");
+        background = new Texture("bg3.png");
         playBtn = new Texture("playbtn.png");
     }
 
@@ -40,7 +40,6 @@ public class MenuState extends State {
         sb.draw(background, 0, 0);
         sb.draw(playBtn, camera.position.x - playBtn.getWidth() / 2, camera.position.y);
         sb.end();
-
     }
 
     @Override

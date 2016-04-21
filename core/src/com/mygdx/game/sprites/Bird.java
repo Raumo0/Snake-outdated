@@ -25,7 +25,7 @@ public class Bird {
         texture = new Texture("birdanimation.png");
         birdAnimation = new Animation(new TextureRegion(texture), 3, 0.5f);
         bounds = new Rectangle(x, y, texture.getWidth() /3, texture.getHeight());
-        flap = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
+//        flap = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
     }
 
     public Vector3 getPosition() {
@@ -52,7 +52,7 @@ public class Bird {
     }
     public void jump(){
         velosity.y = 250;
-        flap.play();
+//        flap.play();
     }
 
     public Rectangle getBounds(){
@@ -62,6 +62,6 @@ public class Bird {
 
     public void dispose() {
         texture.dispose();
-        flap.dispose();
+//        flap.dispose();
     }
 }
