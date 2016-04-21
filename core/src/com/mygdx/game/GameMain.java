@@ -11,8 +11,8 @@ import com.mygdx.game.states.GameStateManager;
 import com.mygdx.game.states.MenuState;
 
 public class GameMain extends Game {
-	public static final int WIDTH = 1200;//480;
-	public static final int HEIGHT = 900;//800;
+	public static final int WIDTH = 600;
+	public static final int HEIGHT = 450;
 
 	public static final String TITLE = "Flappy Demo";
 

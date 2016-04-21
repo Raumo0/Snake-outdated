@@ -1,13 +1,22 @@
 package com.mygdx.game.sprites;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
+
 /**
  * Created by raumo0 on 19.4.16.
  */
 public class SnakePart {
-    public int x, y;
+    public Vector3 position;
+    public TextureRegion texture;
+    public float rotation = 0f;
 
-    public SnakePart(int x, int y){
-        this.x = x;
-        this.y = y;
+    public SnakePart(Vector3 position, Texture texture){
+        this.position = position;
+        this.texture = new TextureRegion(texture);
+    }
+
+    public void dispose(){
     }
 }

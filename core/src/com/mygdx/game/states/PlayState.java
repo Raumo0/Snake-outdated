@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 import com.mygdx.game.GameMain;
 import com.mygdx.game.sprites.Snake;
-import com.mygdx.game.sprites.Tube;
 
 /**
  * Created by raumo0 on 18.4.16.
@@ -45,7 +43,7 @@ public class PlayState extends State {
     @Override
     protected void handleInput() {
         if (Gdx.input.isTouched())
-            snake.turn();
+            snake.turnRight();
     }
 
     @Override
@@ -78,8 +76,13 @@ public class PlayState extends State {
         sb.draw(bg, camera.position.x - (camera.viewportWidth / 2), 0);
 //        sb.draw(snake.getSnake(), snake.getPosition().x, snake.getPosition().y,
 //                snake.getWidth(), snake.getHeight());
-        sb.draw(snake.getSnake(), snake.getPosition().x, snake.getPosition().y, 0, 0,
-                snake.getWidth(), snake.getHeight(), 1, 1, snake.rotation);
+//        sb.draw(snake.getSnake(), snake.getPosition().x, snake.getPosition().y, 0, 0,
+//                snake.getWidth(), snake.getHeight(), 1, 1, snake.rotation);
+        for (int i = 0; i < snake.parts.size(); i++){
+            sb.draw(snake.parts.get(i).texture, snake.parts.get(i).position.x,
+                    snake.parts.get(i).position.y, 0, 0, snake.getWidth(), snake.getHeight(),
+                    1, 1, snake.parts.get(i).rotation);
+        }
 //        draw (TextureRegion region, float x, float y, float originX, float originY, float width, float height,
 //        float scaleX, float scaleY, float rotation)
 
