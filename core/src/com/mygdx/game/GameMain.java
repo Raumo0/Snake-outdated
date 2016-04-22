@@ -3,12 +3,15 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import com.mygdx.game.states.GameStateManager;
 import com.mygdx.game.states.MenuState;
+
+import java.security.Key;
 
 public class GameMain extends Game {
 	public static final int WIDTH = 600;
@@ -38,6 +41,8 @@ public class GameMain extends Game {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		gsm.update(Gdx.graphics.getDeltaTime());
 		gsm.render(batch);
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+			System.exit(0);
 	}
 
 	@Override
