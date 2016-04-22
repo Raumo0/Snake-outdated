@@ -13,39 +13,32 @@ import java.util.List;
  * Created by raumo0 on 19.4.16.
  */
 public class Snake {
-    private static final int MOVEMENT = 100;
-    private static final int GRAVITY = -15;
     private Vector3 position;
     private Vector3 motion = new Vector3(5, 0, 0);//движение
-//    private Vector3 velosity;
     private Rectangle bounds;
 //    private Animation birdAnimation;
     private Texture texture_head;
     private Texture texture_body;
     private Texture texture_tail;
     public float scale = 0.04f;
-//    public float rotation;
     private float angle = -3f;
     private float speed = .5f;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
 
     public Snake(int x, int y){
-//        velosity = new Vector3(0, 0, 0);
         texture_head = new Texture("snake_head.png");
         texture_body = new Texture("snake_body.png");
         texture_tail = new Texture("snake_tail.png");
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         bounds = new Rectangle(x, y, texture_head.getWidth() * scale, texture_head.getHeight() * scale);
 
-        int n = 30;
         for (int i = 1; i < 10; i++)
             parts.add(new SnakePart(new Vector3(x, y, 0), texture_head));
         for (int i = 1; i <= 30; i++)
-            parts.add(new SnakePart(new Vector3(x-i*n, y, 0), texture_body));
+            parts.add(new SnakePart(new Vector3(x, y, 0), texture_body));
         for (int i = 1; i <= 10; i++)
-            parts.add(new SnakePart(new Vector3(x-n*parts.size(), y, 0), texture_tail));
+            parts.add(new SnakePart(new Vector3(x, y, 0), texture_tail));
         position = parts.get(0).position;
-//        rotation = parts.get(0).rotation;
     }
 
     public Vector3 getPosition() {
@@ -53,38 +46,22 @@ public class Snake {
     }
 
     public TextureRegion getSnake() {
-//        return birdAnimation.getFrame();
         return new TextureRegion(texture_head);
     }
 
-    public void update(float dt){
-//        birdAnimation.update(dt);
-//        velosity.scl(dt);
-//        position.add(MOVEMENT * dt, velosity.y, 0);
-        if (position.x > GameMain.WIDTH)
-            position.x = 0;
-        else if (position.x < 0)
-            position.x = GameMain.WIDTH;
-        if (position.y > GameMain.HEIGHT)
-            position.y = 0;
-        else if (position.y < 0)
-            position.y = GameMain.HEIGHT;
-        advance();
-        position.add(move());
-//        velosity.scl(1 / dt);
-        bounds.setPosition(position.x, position.y);
-
-
+    public void turnLeft(){
+        turn(-1f);
     }
 
-    public void turnLeft(){}
-
     public void turnRight(){
-        float x = (float)(motion.x*Math.cos(Math.toRadians(angle)) - motion.y*Math.sin(Math.toRadians(angle)));
-        motion.y = (float)(motion.x*Math.sin(Math.toRadians(angle)) + motion.y*Math.cos(Math.toRadians(angle)));
+        turn(1f);
+    }
+
+    private void turn(float route){
+        float x = (float)(motion.x*Math.cos(Math.toRadians(angle*route)) - motion.y*Math.sin(Math.toRadians(angle*route)));
+        motion.y = (float)(motion.x*Math.sin(Math.toRadians(angle*route)) + motion.y*Math.cos(Math.toRadians(angle*route)));
         motion.x = x;
-        position.add(new Vector3(motion.x * speed, motion.y * speed, motion.z * speed));
-        parts.get(0).rotation += angle;
+        parts.get(0).rotation += angle*route;
         if (parts.get(0).rotation >= 360 || parts.get(0).rotation <= -360)
             parts.get(0).rotation %= 360;
     }
@@ -109,10 +86,18 @@ public class Snake {
     }
 
     private Vector3 move(){
-        return new Vector3(motion.x * speed, motion.y * speed, motion.z * speed);
+        return new Vector3(motion.x * speed, motion.y * speed, 0);
     }
 
-    private void advance() {
+    public void advance() {
+        if (position.x > GameMain.WIDTH)
+            position.x = 0;
+        else if (position.x < 0)
+            position.x = GameMain.WIDTH;
+        if (position.y > GameMain.HEIGHT)
+            position.y = 0;
+        else if (position.y < 0)
+            position.y = GameMain.HEIGHT;
         int len = parts.size() - 1;
         for (int i = len; i > 0; i--){
             SnakePart before = parts.get(i-1);
@@ -121,5 +106,7 @@ public class Snake {
             part.position.y = before.position.y;
             part.rotation = before.rotation;
         }
+        position.add(move());
+        bounds.setPosition(position.x, position.y);
     }
 }
