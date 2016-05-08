@@ -34,8 +34,22 @@ public class PlayState extends State {
 
     @Override
     protected void handleInput() {
-        if (Gdx.input.isTouched())
-            action.turnRight();
+        if (Gdx.input.isTouched(0)) {
+            if (Gdx.input.getX(0) > Gdx.graphics.getWidth() / 2) {
+                action.turnRight();
+            }
+            else if (Gdx.input.getX(0) <= Gdx.graphics.getWidth()/2) {
+                action.turnLeft();
+            }
+        }
+        if (Gdx.input.isTouched(1)) {
+            if (Gdx.input.getX(1) > Gdx.graphics.getWidth() / 2) {
+                action.turnRight();
+            }
+            else if (Gdx.input.getX(1) <= Gdx.graphics.getWidth()/2) {
+                action.turnLeft();
+            }
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             action.turnRight();
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
