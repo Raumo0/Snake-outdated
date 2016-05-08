@@ -14,10 +14,10 @@ import com.mygdx.game.states.MenuState;
 import java.security.Key;
 
 public class GameMain extends Game {
-	public static final int WIDTH = 600;
-	public static final int HEIGHT = 450;
+	public static final int WIDTH = 1080/2;
+	public static final int HEIGHT = 1920/2;
 
-	public static final String TITLE = "Flappy Demo";
+	public static final String TITLE = "Snake Demo";
 
 	private GameStateManager gsm;
 	private SpriteBatch batch;
