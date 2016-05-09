@@ -33,11 +33,11 @@ public class Snake {
         bounds = new Rectangle(x, y, texture_head.getWidth() * scale, texture_head.getHeight() * scale);
 
         for (int i = 1; i < 10; i++)
-            parts.add(new SnakePart(new Vector3(x, y, 0), texture_head));
+            parts.add(new SnakePart(new Vector3(x, y, 0), new TextureRegion(texture_head), 0));
         for (int i = 1; i <= 30; i++)
-            parts.add(new SnakePart(new Vector3(x, y, 0), texture_body));
+            parts.add(new SnakePart(new Vector3(x, y, 0), new TextureRegion(texture_body), 0));
         for (int i = 1; i <= 10; i++)
-            parts.add(new SnakePart(new Vector3(x, y, 0), texture_tail));
+            parts.add(new SnakePart(new Vector3(x, y, 0), new TextureRegion(texture_tail), 0));
         position = parts.get(0).position;
     }
 
@@ -108,5 +108,22 @@ public class Snake {
         }
         position.add(move());
         bounds.setPosition(position.x, position.y);
+    }
+
+    public void eat() {
+        SnakePart end = parts.get(parts.size()-1);
+        for(int i = 0; i < 10; i++)
+            parts.add(new SnakePart(new Vector3(end.position.x, end.position.y, 0), end.texture, end.rotation));
+    }
+
+    public boolean checkBitten() {
+        int len = parts.size();
+        SnakePart head = parts.get(0);
+        for(int i = 1; i < len; i++) {
+            SnakePart part = parts.get(i);
+            if(part.position.x == head.position.x && part.position.y == head.position.y)
+                return true;
+        }
+        return false;
     }
 }

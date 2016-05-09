@@ -12,9 +12,10 @@ public class SnakePart {
     public TextureRegion texture;
     public float rotation = 0f;
 
-    public SnakePart(Vector3 position, Texture texture){
+    public SnakePart(Vector3 position, TextureRegion texture, float rotation){
         this.position = position;
-        this.texture = new TextureRegion(texture);
+        this.texture = texture;
+        this.rotation = rotation;
     }
 
     public void dispose(){

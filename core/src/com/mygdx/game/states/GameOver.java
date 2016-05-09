@@ -38,7 +38,7 @@ public class GameOver extends State {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
-        sb.draw(background, 0, 0);
+        sb.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sb.draw(gameover, camera.position.x - gameover.getWidth() / 2, camera.position.y);
         sb.end();
 

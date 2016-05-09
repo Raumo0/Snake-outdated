@@ -5,12 +5,16 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.Enemy;
 import com.mygdx.game.GameMain;
 import com.mygdx.game.input.Command;
 import com.mygdx.game.input.Switch;
 import com.mygdx.game.input.TurnLeftCommand;
 import com.mygdx.game.input.TurnRightCommand;
 import com.mygdx.game.sprites.Snake;
+import com.mygdx.game.sprites.SnakePart;
+import java.util.Random;
 
 /**
  * Created by raumo0 on 18.4.16.
@@ -21,6 +25,8 @@ public class PlayState extends State {
     private float tickTime = 0f;
     private float tick = 0.01f;
     private Switch action;
+    private Enemy enemy;
+    private Random random = new Random();
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -30,6 +36,8 @@ public class PlayState extends State {
         Command switchLeft = new TurnLeftCommand(snake);
         Command switchRight = new TurnRightCommand(snake);
         action = new Switch(switchLeft, switchRight);
+        enemy = new Enemy(new Vector3(Gdx.graphics.getWidth()/2 - 20,
+                Gdx.graphics.getHeight()/2 -20,0), new Texture("bird.png"));
     }
 
     @Override
@@ -56,6 +64,11 @@ public class PlayState extends State {
             action.turnLeft();
     }
 
+    private void placeEnemy() {
+        enemy.position.x = random.nextInt(GameMain.WIDTH - 20);
+        enemy.position.y = random.nextInt(GameMain.HEIGHT - 20);
+    }
+
     @Override
     public void update(float dt) {
         tickTime += dt;
@@ -63,6 +76,17 @@ public class PlayState extends State {
             tickTime -= tick;
             handleInput();
             snake.advance();
+            if (snake.checkBitten()) {
+                //game over
+                gsm.set(new GameOver(gsm));
+            }
+            SnakePart head = snake.parts.get(0);
+            if (enemy.position.x-head.position.x < 20 && enemy.position.x-head.position.x > -20
+                    && enemy.position.y-head.position.y < 20 && enemy.position.y-head.position.y > -20) {
+                //score++
+                snake.eat();
+                placeEnemy();
+            }
         }
 //        camera.position.x = snake.getPosition().x;
 //        camera.position.y = snake.getPosition().y;
@@ -79,6 +103,7 @@ public class PlayState extends State {
                     snake.parts.get(i).position.y, 0, 0, snake.getWidth(), snake.getHeight(),
                     1, 1, snake.parts.get(i).rotation);
         }
+        sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
         sb.end();
     }
 
