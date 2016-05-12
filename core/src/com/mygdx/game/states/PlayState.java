@@ -36,8 +36,8 @@ public class PlayState extends State {
         Command switchLeft = new TurnLeftCommand(snake);
         Command switchRight = new TurnRightCommand(snake);
         action = new Switch(switchLeft, switchRight);
-        enemy = new Enemy(new Vector3(Gdx.graphics.getWidth()/2 - 20,
-                Gdx.graphics.getHeight()/2 -20,0), new Texture("bird.png"));
+        enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
+                random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"));
     }
 
     @Override
@@ -65,8 +65,8 @@ public class PlayState extends State {
     }
 
     private void placeEnemy() {
-        enemy.position.x = random.nextInt(GameMain.WIDTH - 20);
-        enemy.position.y = random.nextInt(GameMain.HEIGHT - 20);
+        enemy.position.x = random.nextInt(GameMain.WIDTH - 50);
+        enemy.position.y = random.nextInt(GameMain.HEIGHT - 50);
     }
 
     @Override
@@ -77,7 +77,6 @@ public class PlayState extends State {
             handleInput();
             snake.advance();
             if (snake.checkBitten()) {
-                //game over
                 gsm.set(new GameOver(gsm));
             }
             SnakePart head = snake.parts.get(0);
