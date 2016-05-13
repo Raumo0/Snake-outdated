@@ -2,6 +2,8 @@ package com.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.GameMain;
 
@@ -14,7 +16,6 @@ import java.util.List;
 public class Snake {
     private Vector3 position;
     private Vector3 direction = new Vector3(1, 0, 0);
-//    private Rectangle bounds;
 //    private Animation birdAnimation;
     private TextureRegion texture_head;
     private TextureRegion texture_body;
@@ -29,14 +30,19 @@ public class Snake {
         texture_body = new TextureRegion(new Texture("snake_body.png"));
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
-//        bounds = new Rectangle(x, y, texture_head.getWidth() * scale, texture_head.getHeight() * scale);
         position = new Vector3(x, y, 0);
         for (int i = 0; i < 5; i++)
-            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.head, 0));
+            parts.add(new SnakePart(correctPosition(
+                    new Vector3(position.x-parts.size()*5, position.y, position.x)),
+                    SnakePart.TextureType.head, 0));
         for (int i = 1; i <= 30; i++)
-            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.body, 0));
+            parts.add(new SnakePart(
+                    correctPosition(new Vector3(position.x-parts.size()*5, position.y, position.x)),
+                    SnakePart.TextureType.body, 0));
         for (int i = 1; i <= 5; i++)
-            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.tail, 0));
+            parts.add(new SnakePart(
+                    correctPosition(new Vector3(position.x-parts.size()*5, position.y, position.x)),
+                    SnakePart.TextureType.tail, 0));
     }
 
     public TextureRegion getTexture(SnakePart.TextureType type){
@@ -80,9 +86,15 @@ public class Snake {
             parts.get(0).rotation %= 360;
     }
 
-//    public Rectangle getBounds(){
-//        return bounds;
-//    }
+    public Polygon getBounds(SnakePart part){
+        TextureRegion texture = getTexture(part.type);
+        Polygon bounds = new Polygon(new float[]{0, 0, texture.getRegionWidth()*scale, 0,
+                texture.getRegionWidth()*scale, texture.getRegionHeight()*scale,
+                0, texture.getRegionHeight()*scale});
+        bounds.setPosition(part.position.x, part.position.y);
+        bounds.setRotation(part.rotation);
+        return bounds;
+    }
 
 
     public void dispose() {
@@ -119,7 +131,6 @@ public class Snake {
         }
         position.add(move());
         parts.get(0).position = correctPosition(position);
-//        bounds.setPosition(position.x, position.y);
     }
 
     public void eat() {
@@ -132,9 +143,9 @@ public class Snake {
     public boolean checkBitten() {
         int len = parts.size();
         SnakePart head = parts.get(0);
-        for(int i = 1; i < len; i++) {
+        for(int i = 15; i < len; i++) {
             SnakePart part = parts.get(i);
-            if(part.position.x == head.position.x && part.position.y == head.position.y)
+            if (Intersector.overlapConvexPolygons(getBounds(head), getBounds(part)))
                 return true;
         }
         return false;

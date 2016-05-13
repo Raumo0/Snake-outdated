@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Enemy;
 import com.mygdx.game.GameMain;
@@ -80,8 +81,7 @@ public class PlayState extends State {
                 gsm.set(new GameOver(gsm));
             }
             SnakePart head = snake.parts.get(0);
-            if (enemy.position.x-head.position.x < 20 && enemy.position.x-head.position.x > -20
-                    && enemy.position.y-head.position.y < 20 && enemy.position.y-head.position.y > -20) {
+            if (Intersector.overlapConvexPolygons(enemy.getBounds(),snake.getBounds(head))) {
                 //score++
                 snake.eat();
                 placeEnemy();
