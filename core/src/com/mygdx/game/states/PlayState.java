@@ -98,7 +98,7 @@ public class PlayState extends State {
         sb.begin();
         sb.draw(bg, camera.position.x - (camera.viewportWidth / 2), 0, GameMain.WIDTH, GameMain.HEIGHT);
         for (int i = 0; i < snake.parts.size(); i++){
-            sb.draw(snake.parts.get(i).texture, snake.parts.get(i).position.x,
+            sb.draw(snake.getTexture(snake.parts.get(i).type), snake.parts.get(i).position.x,
                     snake.parts.get(i).position.y, 0, 0, snake.getWidth(), snake.getHeight(),
                     1, 1, snake.parts.get(i).rotation);
         }

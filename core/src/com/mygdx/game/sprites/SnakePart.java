@@ -1,7 +1,5 @@
 package com.mygdx.game.sprites;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -9,13 +7,16 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class SnakePart {
     public Vector3 position;
-    public TextureRegion texture;
     public float rotation = 0f;
+    public final TextureType type;
+    public enum TextureType {
+        head, body, tail
+    }
 
-    public SnakePart(Vector3 position, TextureRegion texture, float rotation){
+    public SnakePart(Vector3 position, TextureType type, float rotation){
         this.position = position;
-        this.texture = texture;
         this.rotation = rotation;
+        this.type = type;
     }
 
     public void dispose(){

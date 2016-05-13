@@ -2,7 +2,6 @@ package com.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.GameMain;
 
@@ -17,32 +16,41 @@ public class Snake {
     private Vector3 direction = new Vector3(1, 0, 0);
 //    private Rectangle bounds;
 //    private Animation birdAnimation;
-    private Texture texture_head;
-    private Texture texture_body;
-    private Texture texture_tail;
+    private TextureRegion texture_head;
+    private TextureRegion texture_body;
+    private TextureRegion texture_tail;
     public float scale = 0.04f;
     private float angle = -3f;
     public float speed = 2.5f;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
 
     public Snake(int x, int y){
-        texture_head = new Texture("snake_head.png");
-        texture_body = new Texture("snake_body.png");
-        texture_tail = new Texture("snake_tail.png");
+        texture_head = new TextureRegion(new Texture("snake_head.png"));
+        texture_body = new TextureRegion(new Texture("snake_body.png"));
+        texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
 //        bounds = new Rectangle(x, y, texture_head.getWidth() * scale, texture_head.getHeight() * scale);
         position = new Vector3(x, y, 0);
         for (int i = 0; i < 5; i++)
-            parts.add(new SnakePart(correctPosition(position), new TextureRegion(texture_head), 0));
+            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.head, 0));
         for (int i = 1; i <= 30; i++)
-            parts.add(new SnakePart(correctPosition(position), new TextureRegion(texture_body), 0));
+            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.body, 0));
         for (int i = 1; i <= 5; i++)
-            parts.add(new SnakePart(correctPosition(position), new TextureRegion(texture_tail), 0));
+            parts.add(new SnakePart(correctPosition(position), SnakePart.TextureType.tail, 0));
+    }
+
+    public TextureRegion getTexture(SnakePart.TextureType type){
+        switch (type){
+            case head: return texture_head;
+            case body: return texture_body;
+            case tail: return texture_tail;
+        }
+        return null;
     }
 
     private Vector3 correctPosition(Vector3 oldPosition){
-        float c = texture_head.getWidth()/2;
-        float b = texture_head.getHeight()/2;
+        float c = texture_head.getRegionWidth()/2;
+        float b = texture_head.getRegionHeight()/2;
         float a = (float) Math.sqrt(c*c + b*b);
         float angle = (float) Math.toDegrees(Math.acos((a*a + b*b - c*c)/(2*a*b)));
         return turn(direction, (angle + 90) * -1).scl(a * scale).add(oldPosition);
@@ -78,17 +86,14 @@ public class Snake {
 
 
     public void dispose() {
-        texture_head.dispose();
-        texture_body.dispose();
-        texture_tail.dispose();
     }
 
     public float getWidth(){
-        return texture_head.getWidth() * scale;
+        return texture_head.getRegionWidth() * scale;
     }
 
     public float getHeight(){
-        return texture_head.getHeight() * scale;
+        return texture_head.getRegionHeight() * scale;
     }
 
     private Vector3 move(){
@@ -120,7 +125,8 @@ public class Snake {
     public void eat() {
         SnakePart end = parts.get(parts.size()-1);
         for(int i = 0; i < 10; i++)
-            parts.add(new SnakePart(new Vector3(end.position.x, end.position.y, 0), end.texture, end.rotation));
+            parts.add(new SnakePart(new Vector3(end.position.x, end.position.y, 0),
+                    end.type, end.rotation));
     }
 
     public boolean checkBitten() {
