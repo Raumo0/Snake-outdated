@@ -2,6 +2,7 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -24,10 +25,11 @@ public class PlayState extends State {
     private Snake snake;
     private Texture bg;
     private float tickTime = 0f;
-    private float tick = 0.01f;
+    private float tick = 0.016f;
     private Switch action;
     private Enemy enemy;
     private Random random = new Random();
+    private FPSLogger fps = new FPSLogger();
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -90,6 +92,8 @@ public class PlayState extends State {
 //        camera.position.x = snake.getPosition().x;
 //        camera.position.y = snake.getPosition().y;
         camera.update();
+        fps.log();
+        Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
     }
 
     @Override
