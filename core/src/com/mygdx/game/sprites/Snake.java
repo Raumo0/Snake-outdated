@@ -88,9 +88,15 @@ public class Snake {
 
     public Polygon getBounds(SnakePart part){
         TextureRegion texture = getTexture(part.type);
-        Polygon bounds = new Polygon(new float[]{0, 0, texture.getRegionWidth()*scale, 0,
-                texture.getRegionWidth()*scale, texture.getRegionHeight()*scale,
-                0, texture.getRegionHeight()*scale});
+        float n;
+        if (part.type == SnakePart.TextureType.head)
+            n = .05f;
+        else
+            n = 1f;
+        float width = texture.getRegionWidth()*scale;
+        float height = texture.getRegionHeight()*scale;
+        Polygon bounds = new Polygon(new float[]{width-width*n, 0, width, 0,
+                width, height, width-width*n, height});
         bounds.setPosition(part.position.x, part.position.y);
         bounds.setRotation(part.rotation);
         return bounds;
@@ -135,16 +141,16 @@ public class Snake {
     }
 
     public void eat() {
-        SnakePart end = parts.get(parts.size()-1);
+        SnakePart end = parts.get(parts.size()-2);
         for(int i = 0; i < 10; i++)
-            parts.add(new SnakePart(new Vector3(end.position.x, end.position.y, 0),
-                    end.type, end.rotation));
+            parts.add(parts.indexOf(end), new SnakePart(new Vector3(end.position.x, end.position.y,
+                    end.position.z), end.type, end.rotation));
     }
 
     public boolean checkBitten() {
         int len = parts.size();
         SnakePart head = parts.get(0);
-        for(int i = 15; i < len; i++) {
+        for(int i = 1; i < len; i++) {
             SnakePart part = parts.get(i);
             if (Intersector.overlapConvexPolygons(getBounds(head), getBounds(part)))
                 return true;
