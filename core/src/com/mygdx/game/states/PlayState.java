@@ -2,7 +2,6 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -44,19 +43,20 @@ public class PlayState extends State {
 
     @Override
     protected void handleInput() {
+        int centre = Gdx.graphics.getWidth() / 2;
         if (Gdx.input.isTouched(0)) {
-            if (Gdx.input.getX(0) > Gdx.graphics.getWidth() / 2) {
+            if (Gdx.input.getX(0) > centre) {
                 action.turnRight();
             }
-            else if (Gdx.input.getX(0) <= Gdx.graphics.getWidth()/2) {
+            else if (Gdx.input.getX(0) <= centre) {
                 action.turnLeft();
             }
         }
         if (Gdx.input.isTouched(1)) {
-            if (Gdx.input.getX(1) > Gdx.graphics.getWidth() / 2) {
+            if (Gdx.input.getX(1) > centre && Gdx.input.getX(0) <= centre) {
                 action.turnRight();
             }
-            else if (Gdx.input.getX(1) <= Gdx.graphics.getWidth()/2) {
+            else if (Gdx.input.getX(1) <= centre && Gdx.input.getX(0) > centre) {
                 action.turnLeft();
             }
         }
