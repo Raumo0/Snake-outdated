@@ -29,7 +29,6 @@ public class PlayState extends State {
     private Switch action;
     private Enemy enemy;
     private Random random = new Random();
-    private FPSLogger fps = new FPSLogger();
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -80,6 +79,7 @@ public class PlayState extends State {
             handleInput();
             snake.advance();
             if (snake.checkBitten()) {
+                Gdx.input.vibrate(200);
                 gsm.set(new GameOver(gsm));
             }
             SnakePart head = snake.parts.get(0);
@@ -92,8 +92,14 @@ public class PlayState extends State {
 //        camera.position.x = snake.getPosition().x;
 //        camera.position.y = snake.getPosition().y;
         camera.update();
-        fps.log();
+        Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
         Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
+        Gdx.app.log("Distance: ", String.valueOf(
+                snake.parts.get(0).position.dst(snake.parts.get(1).position)));
+        Gdx.app.log("Part width: ", String.valueOf(snake.getTexture(SnakePart.TextureType.head).
+                getRegionWidth()*snake.scale));
+        Gdx.app.log("Native heap(Mb): ", String.valueOf(Gdx.app.getNativeHeap()/(1024*1024)));
+        Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
     }
 
     @Override
