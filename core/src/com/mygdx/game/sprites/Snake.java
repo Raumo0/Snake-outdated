@@ -31,15 +31,11 @@ public class Snake {
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         position = new Vector3(x, y, 0);
-        parts.add(new SnakePart(correctPosition(
-                    new Vector3(position.x-parts.size()*5, position.y, 0)),
-                    SnakePart.TextureType.head, 0));
+        parts.add(new SnakePart(position, SnakePart.TextureType.head, 0));
         for (int i = 1; i <= 50; i++)
-            parts.add(new SnakePart(
-                    correctPosition(new Vector3(position.x-parts.size()*5, position.y, 0)),
+            parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0),
                     SnakePart.TextureType.body, 0));
-        parts.add(new SnakePart(
-                    correctPosition(new Vector3(position.x-parts.size()*5, position.y, 0)),
+        parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0),
                     SnakePart.TextureType.tail, 0));
     }
 
@@ -50,14 +46,6 @@ public class Snake {
             case tail: return texture_tail;
         }
         return null;
-    }
-
-    private Vector3 correctPosition(Vector3 oldPosition){
-        float c = texture_head.getRegionWidth()/2;
-        float b = texture_head.getRegionHeight()/2;
-        float a = (float) Math.sqrt(c*c + b*b);
-        float angle = (float) Math.toDegrees(Math.acos((a*a + b*b - c*c)/(2*a*b)));
-        return turn(direction, (angle + 90) * -1).scl(a * scale).add(oldPosition);
     }
 
     public void turnLeft(){
@@ -97,6 +85,7 @@ public class Snake {
                 width, height, width-width*n, height});
         bounds.setPosition(part.position.x, part.position.y);
         bounds.setRotation(part.rotation);
+        bounds.setOrigin(width/2, height/2);
         return bounds;
     }
 
@@ -135,7 +124,6 @@ public class Snake {
             part.rotation = before.rotation;
         }
         position.add(move());
-        parts.get(0).position = correctPosition(position);
     }
 
     public void eat() {
