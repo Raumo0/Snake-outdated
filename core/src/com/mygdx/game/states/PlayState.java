@@ -106,14 +106,27 @@ public class PlayState extends State {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
-        sb.draw(bg, camera.position.x - (camera.viewportWidth / 2), 0, GameMain.WIDTH, GameMain.HEIGHT);
-        for (int i = 0; i < snake.parts.size(); i++){
-            SnakePart part = snake.parts.get(i);
+        sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
+        float scale = 1.5f;
+        SnakePart part = snake.parts.get(0);
+        sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
+                snake.getWidth()/2, snake.getHeight()/2,
+                snake.getWidth(), snake.getHeight(),
+                scale, scale, part.rotation);
+        scale = 1f;
+        float excess = .6f * snake.getWidth() / snake.speed;
+        for (int i = 1; i < snake.parts.size()-excess; i++){
+            part = snake.parts.get(i);
             sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
                     snake.getWidth()/2, snake.getHeight()/2,
                     snake.getWidth(), snake.getHeight(),
-                    1, 1, part.rotation);
+                    scale, scale, part.rotation);
         }
+        part = snake.parts.get(snake.parts.size()-1);
+        sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
+                snake.getWidth()/2, snake.getHeight()/2,
+                snake.getWidth(), snake.getHeight(),
+                scale, scale, part.rotation);
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
         sb.end();
     }
