@@ -21,8 +21,17 @@ import java.util.Random;
  * Created by raumo0 on 18.4.16.
  */
 public class PlayState extends State {
+    private enum GameState {
+        Ready,
+        Running,
+        Paused,
+        GameOver
+    }
+    private GameState state = GameState.Running;
     private Snake snake;
     private Texture bg;
+    private Texture buttons;
+    private Texture pause;
     private float tickTime = 0f;
     private float tick = 0.016f;
     private Switch action;
@@ -34,6 +43,8 @@ public class PlayState extends State {
         snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2);
         camera.setToOrtho(false, GameMain.WIDTH , GameMain.HEIGHT );
         bg = new Texture("bg3.png");
+        buttons = new Texture("buttons.png");
+        pause = new Texture("pausemenu.png");
         Command switchLeft = new TurnLeftCommand(snake);
         Command switchRight = new TurnRightCommand(snake);
         action = new Switch(switchLeft, switchRight);
@@ -73,6 +84,22 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
+        if (state == GameState.Ready);
+        if (state == GameState.Running)
+            updateRunning(dt);
+        if (state == GameState.Paused)
+            updatePaused();
+        if (state == GameState.GameOver);
+    }
+
+    private void updateRunning(float dt){
+        for (int i = 0; i < 5; i++)
+            if (Gdx.input.isTouched(i) &&
+                    Gdx.input.getX(i) > Gdx.graphics.getWidth()-Gdx.graphics.getWidth()/5 &&
+                    Gdx.input.getY(i) < Gdx.graphics.getHeight()/7) {
+                state = GameState.Paused;
+                return;
+            }
         tickTime += dt;
         while (tickTime > tick) {
             tickTime -= tick;
@@ -102,11 +129,36 @@ public class PlayState extends State {
         Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
     }
 
+    private void updatePaused(){
+        for (int i = 0; i < 5; i++)
+            if (Gdx.input.isTouched(i) && Gdx.input.getX(i) > Gdx.graphics.getWidth()/2-200 &&
+                Gdx.input.getX(i) < Gdx.graphics.getWidth()/2+200 &&
+                Gdx.input.getY(i) > Gdx.graphics.getHeight()/2-200 &&
+                Gdx.input.getY(i) < Gdx.graphics.getHeight()/2+200) {
+            state = GameState.Running;
+            return;
+        }
+    }
+
     @Override
     public void render(SpriteBatch sb) {
+
+
+
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
+        drawWorld(sb);
+        if (state == GameState.Ready);
+        if (state == GameState.Running)
+            drawRunningUI(sb);
+        if (state == GameState.Paused)
+            drawPausedUI(sb);
+        if (state == GameState.GameOver);
+        sb.end();
+    }
+
+    private void drawWorld(SpriteBatch sb){
         float scale = 1.5f;
         SnakePart part = snake.parts.get(0);
         sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
@@ -128,9 +180,19 @@ public class PlayState extends State {
                 snake.getWidth(), snake.getHeight(),
                 scale, scale, part.rotation);
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
-        sb.end();
     }
 
+    private void drawRunningUI(SpriteBatch sb){
+        int width = GameMain.WIDTH/10;
+        int height = GameMain.HEIGHT/10;
+        sb.draw(buttons, GameMain.WIDTH-width, GameMain.HEIGHT-height, width, height,
+                64, 128, 64, 64, false, false);
+    }
+
+    private void drawPausedUI(SpriteBatch sb){
+        sb.draw(pause, GameMain.WIDTH/2-100, GameMain.HEIGHT/2-100, 200, 200, 0, 0,
+                pause.getWidth(), pause.getHeight()/2, false, false);
+    }
     @Override
     public void dispose() {
         bg.dispose();
