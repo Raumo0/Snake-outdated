@@ -142,9 +142,6 @@ public class PlayState extends State {
 
     @Override
     public void render(SpriteBatch sb) {
-
-
-
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
@@ -164,7 +161,7 @@ public class PlayState extends State {
         sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
                 snake.getWidth()/2, snake.getHeight()/2,
                 snake.getWidth(), snake.getHeight(),
-                scale, scale, part.rotation);
+                scale*part.scale, scale*part.scale, part.rotation);
         scale = 1f;
         float excess = .6f * snake.getWidth() / snake.speed;
         for (int i = 1; i < snake.parts.size()-excess; i++){
@@ -172,13 +169,13 @@ public class PlayState extends State {
             sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
                     snake.getWidth()/2, snake.getHeight()/2,
                     snake.getWidth(), snake.getHeight(),
-                    scale, scale, part.rotation);
+                    scale*part.scale, scale*part.scale, part.rotation);
         }
         part = snake.parts.get(snake.parts.size()-1);
         sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
                 snake.getWidth()/2, snake.getHeight()/2,
                 snake.getWidth(), snake.getHeight(),
-                scale, scale, part.rotation);
+                scale*part.scale, scale*part.scale, part.rotation);
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
     }
 

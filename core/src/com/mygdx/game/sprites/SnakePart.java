@@ -9,14 +9,16 @@ public class SnakePart {
     public Vector3 position;
     public float rotation = 0f;
     public final TextureType type;
+    public float scale;
     public enum TextureType {
         head, body, tail
     }
 
-    public SnakePart(Vector3 position, TextureType type, float rotation){
+    public SnakePart(Vector3 position, TextureType type, float rotation, float scale){
         this.position = position;
         this.rotation = rotation;
         this.type = type;
+        this.scale = scale;
     }
 
     public void dispose(){

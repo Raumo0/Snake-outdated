@@ -31,12 +31,12 @@ public class Snake {
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         position = new Vector3(x, y, 0);
-        parts.add(new SnakePart(position, SnakePart.TextureType.head, 0));
+        parts.add(new SnakePart(position, SnakePart.TextureType.head, 0f, 1f));
         for (int i = 1; i <= 50; i++)
-            parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0),
-                    SnakePart.TextureType.body, 0));
-        parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0),
-                    SnakePart.TextureType.tail, 0));
+            parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0f),
+                    SnakePart.TextureType.body, 0f, 1f));
+        parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0f),
+                    SnakePart.TextureType.tail, 0f, 1f));
     }
 
     public TextureRegion getTexture(SnakePart.TextureType type){
@@ -122,15 +122,18 @@ public class Snake {
             part.position.y = before.position.y;
             part.position.z = before.position.z;
             part.rotation = before.rotation;
+            part.scale = before.scale;
         }
         position.add(move());
     }
 
     public void eat() {
-        SnakePart end = parts.get(parts.size()-2);
+        if (parts.size() < 2)
+            return;
+        SnakePart end = parts.get(1);
         for(int i = 0; i < 10; i++)
             parts.add(parts.indexOf(end), new SnakePart(new Vector3(end.position.x, end.position.y,
-                    end.position.z), end.type, end.rotation));
+                    end.position.z), end.type, end.rotation, 1.5f));
     }
 
     public boolean checkBitten() {
