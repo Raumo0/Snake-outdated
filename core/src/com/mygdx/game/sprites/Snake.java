@@ -20,7 +20,7 @@ public class Snake {
     private TextureRegion texture_head;
     private TextureRegion texture_body;
     private TextureRegion texture_tail;
-    public float scale = 0.04f;
+    private float scale = 0.04f;
     private float angle = -3f;
     public float speed = 2.5f;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
@@ -93,12 +93,36 @@ public class Snake {
     public void dispose() {
     }
 
-    public float getWidth(){
-        return texture_head.getRegionWidth() * scale;
+    public float getWidth(SnakePart.TextureType type){
+        if (type == SnakePart.TextureType.head)
+            return texture_head.getRegionWidth() * scale;
+        if (type == SnakePart.TextureType.body)
+            return texture_body.getRegionWidth() * scale;
+        return texture_tail.getRegionWidth() * scale;
     }
 
-    public float getHeight(){
-        return texture_head.getRegionHeight() * scale;
+    public float getHeight(SnakePart.TextureType type){
+        if (type == SnakePart.TextureType.head)
+            return texture_head.getRegionHeight() * scale;
+        if (type == SnakePart.TextureType.body)
+            return texture_body.getRegionHeight() * scale;
+        return texture_tail.getRegionHeight() * scale;
+    }
+
+    public float getScaleX(SnakePart part){
+        if (part.type == SnakePart.TextureType.head)
+            return part.scale;
+        if (part.type == SnakePart.TextureType.body)
+            return part.scale * texture_head.getRegionWidth() / texture_body.getRegionWidth();
+        return part.scale * texture_head.getRegionWidth() / texture_tail.getRegionWidth();
+    }
+
+    public float getScaleY(SnakePart part){
+        if (part.type == SnakePart.TextureType.head)
+            return part.scale;
+        if (part.type == SnakePart.TextureType.body)
+            return part.scale * texture_head.getRegionHeight() / texture_body.getRegionHeight();
+        return part.scale * texture_head.getRegionHeight() / texture_tail.getRegionHeight();
     }
 
     private Vector3 move(){

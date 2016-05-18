@@ -123,8 +123,7 @@ public class PlayState extends State {
         Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
         Gdx.app.log("Distance: ", String.valueOf(
                 snake.parts.get(0).position.dst(snake.parts.get(1).position)));
-        Gdx.app.log("Part width: ", String.valueOf(snake.getTexture(SnakePart.TextureType.head).
-                getRegionWidth()*snake.scale));
+        Gdx.app.log("Part width: ", String.valueOf(snake.getWidth(SnakePart.TextureType.head)));
         Gdx.app.log("Native heap(Mb): ", String.valueOf(Gdx.app.getNativeHeap()/(1024*1024)));
         Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
     }
@@ -158,24 +157,32 @@ public class PlayState extends State {
     private void drawWorld(SpriteBatch sb){
         float scale = 1.5f;
         SnakePart part = snake.parts.get(0);
-        sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
-                snake.getWidth()/2, snake.getHeight()/2,
-                snake.getWidth(), snake.getHeight(),
-                scale*part.scale, scale*part.scale, part.rotation);
+        sb.draw(snake.getTexture(part.type),
+                part.position.x - snake.getWidth(part.type)/2,
+                part.position.y - snake.getHeight(part.type)/2,
+                snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
+                snake.getWidth(part.type), snake.getHeight(part.type),
+                scale * snake.getScaleX(part), scale * snake.getScaleY(part), part.rotation);
         scale = 1f;
-        float excess = .6f * snake.getWidth() / snake.speed;
-        for (int i = 1; i < snake.parts.size()-excess; i++){
+        float excess = .6f * snake.getWidth(SnakePart.TextureType.tail) / snake.speed;
+        for (int i = 5; i < snake.parts.size()-excess; i++){
             part = snake.parts.get(i);
-            sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
-                    snake.getWidth()/2, snake.getHeight()/2,
-                    snake.getWidth(), snake.getHeight(),
-                    scale*part.scale, scale*part.scale, part.rotation);
+            sb.draw(snake.getTexture(part.type),
+                    part.position.x - snake.getWidth(part.type)/2,
+                    part.position.y - snake.getHeight(part.type)/2,
+                    snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
+                    snake.getWidth(part.type), snake.getHeight(part.type),
+                    snake.getScaleX(part), snake.getScaleY(part), part.rotation);
         }
         part = snake.parts.get(snake.parts.size()-1);
-        sb.draw(snake.getTexture(part.type), part.position.x, part.position.y,
-                snake.getWidth()/2, snake.getHeight()/2,
-                snake.getWidth(), snake.getHeight(),
-                scale*part.scale, scale*part.scale, part.rotation);
+        scale = 2f;
+        sb.draw(snake.getTexture(part.type),
+                part.position.x - snake.getWidth(part.type)/2,
+                part.position.y - snake.getHeight(part.type)/2,
+                snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
+                snake.getWidth(part.type), snake.getHeight(part.type),
+                scale * snake.getScaleX(part), snake.getScaleY(part), part.rotation);
+
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
     }
 
