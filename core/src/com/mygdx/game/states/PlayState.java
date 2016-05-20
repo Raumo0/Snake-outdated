@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.Enemy;
+import com.mygdx.game.World;
+import com.mygdx.game.sprites.Enemy;
 import com.mygdx.game.GameMain;
 import com.mygdx.game.input.Command;
 import com.mygdx.game.input.Switch;
@@ -28,28 +29,28 @@ public class PlayState extends State {
         GameOver
     }
     private GameState state = GameState.Running;
-    private Snake snake;
     private Texture bg;
     private Texture buttons;
     private Texture pause;
-    private float tickTime = 0f;
-    private float tick = 0.016f;
+    private Texture numbers;
+    private Texture gameover;
+    private World world;
     private Switch action;
-    private Enemy enemy;
-    private Random random = new Random();
+    private int oldScore = 0;
+    private String score = "0";
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
-        snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2);
         camera.setToOrtho(false, GameMain.WIDTH , GameMain.HEIGHT );
         bg = new Texture("bg3.png");
         buttons = new Texture("buttons.png");
         pause = new Texture("pausemenu.png");
-        Command switchLeft = new TurnLeftCommand(snake);
-        Command switchRight = new TurnRightCommand(snake);
+        numbers = new Texture("numbers.png");
+        gameover = new Texture("gameover.png");
+        world = new World();
+        Command switchLeft = new TurnLeftCommand(world.snake);
+        Command switchRight = new TurnRightCommand(world.snake);
         action = new Switch(switchLeft, switchRight);
-        enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
-                random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"));
     }
 
     @Override
@@ -77,11 +78,6 @@ public class PlayState extends State {
             action.turnLeft();
     }
 
-    private void placeEnemy() {
-        enemy.position.x = random.nextInt(GameMain.WIDTH - 50);
-        enemy.position.y = random.nextInt(GameMain.HEIGHT - 50);
-    }
-
     @Override
     public void update(float dt) {
         if (state == GameState.Ready);
@@ -89,7 +85,8 @@ public class PlayState extends State {
             updateRunning(dt);
         if (state == GameState.Paused)
             updatePaused();
-        if (state == GameState.GameOver);
+        if (state == GameState.GameOver)
+            updateGameOver();
     }
 
     private void updateRunning(float dt){
@@ -100,32 +97,17 @@ public class PlayState extends State {
                 state = GameState.Paused;
                 return;
             }
-        tickTime += dt;
-        while (tickTime > tick) {
-            tickTime -= tick;
-            handleInput();
-            snake.advance();
-            if (snake.checkBitten()) {
-                Gdx.input.vibrate(200);
-                gsm.set(new GameOver(gsm));
-            }
-            SnakePart head = snake.parts.get(0);
-            if (Intersector.overlapConvexPolygons(enemy.getBounds(),snake.getBounds(head))) {
-                //score++
-                snake.eat();
-                placeEnemy();
-            }
+        handleInput();
+        world.update(dt);
+        if (world.gameOver)
+            state = GameState.GameOver;
+        if (oldScore != world.score) {
+            oldScore = world.score;
+            score = "" + oldScore;
         }
 //        camera.position.x = snake.getPosition().x;
 //        camera.position.y = snake.getPosition().y;
         camera.update();
-        Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
-        Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
-        Gdx.app.log("Distance: ", String.valueOf(
-                snake.parts.get(0).position.dst(snake.parts.get(1).position)));
-        Gdx.app.log("Part width: ", String.valueOf(snake.getWidth(SnakePart.TextureType.head)));
-        Gdx.app.log("Native heap(Mb): ", String.valueOf(Gdx.app.getNativeHeap()/(1024*1024)));
-        Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
     }
 
     private void updatePaused(){
@@ -139,51 +121,52 @@ public class PlayState extends State {
         }
     }
 
+    private void updateGameOver(){
+        if (Gdx.input.justTouched())
+            gsm.set(new MenuState(gsm));
+    }
+
     @Override
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(camera.combined);
         sb.begin();
         sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
-        drawWorld(sb);
+        world.draw(sb);
         if (state == GameState.Ready);
         if (state == GameState.Running)
             drawRunningUI(sb);
         if (state == GameState.Paused)
             drawPausedUI(sb);
-        if (state == GameState.GameOver);
+        if (state == GameState.GameOver)
+            drawGameOverUi(sb);
+
+        drawText(sb, score, GameMain.WIDTH/2 - score.length()*20/2, GameMain.HEIGHT - 42);
         sb.end();
     }
 
-    private void drawWorld(SpriteBatch sb){
-        float scale = 1.5f;
-        SnakePart part = snake.parts.get(0);
-        sb.draw(snake.getTexture(part.type),
-                part.position.x - snake.getWidth(part.type)/2,
-                part.position.y - snake.getHeight(part.type)/2,
-                snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
-                snake.getWidth(part.type), snake.getHeight(part.type),
-                scale * snake.getScaleX(part), scale * snake.getScaleY(part), part.rotation);
-        scale = 1f;
-        float excess = .6f * snake.getWidth(SnakePart.TextureType.tail) / snake.speed;
-        for (int i = 5; i < snake.parts.size()-excess; i++){
-            part = snake.parts.get(i);
-            sb.draw(snake.getTexture(part.type),
-                    part.position.x - snake.getWidth(part.type)/2,
-                    part.position.y - snake.getHeight(part.type)/2,
-                    snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
-                    snake.getWidth(part.type), snake.getHeight(part.type),
-                    snake.getScaleX(part), snake.getScaleY(part), part.rotation);
-        }
-        part = snake.parts.get(snake.parts.size()-1);
-        scale = 2f;
-        sb.draw(snake.getTexture(part.type),
-                part.position.x - snake.getWidth(part.type)/2,
-                part.position.y - snake.getHeight(part.type)/2,
-                snake.getWidth(part.type)/2, snake.getHeight(part.type)/2,
-                snake.getWidth(part.type), snake.getHeight(part.type),
-                scale * snake.getScaleX(part), snake.getScaleY(part), part.rotation);
+    private void drawText(SpriteBatch sb, String line, int x, int y){
+        int len = line.length();
+        for (int i = 0; i < len; i++) {
+            char character = line.charAt(i);
 
-        sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
+            if (character == ' ') {
+                x += 20;
+                continue;
+            }
+
+            int srcX = 0;
+            int srcWidth = 0;
+            if (character == '.') {
+                srcX = 200;
+                srcWidth = 10;
+            } else {
+                srcX = (character - '0') * 20;
+                srcWidth = 20;
+            }
+
+            sb.draw(numbers, x, y, srcX, 0, srcWidth, 32);
+            x += srcWidth;
+        }
     }
 
     private void drawRunningUI(SpriteBatch sb){
@@ -197,10 +180,14 @@ public class PlayState extends State {
         sb.draw(pause, GameMain.WIDTH/2-100, GameMain.HEIGHT/2-100, 200, 200, 0, 0,
                 pause.getWidth(), pause.getHeight()/2, false, false);
     }
+
+    private void drawGameOverUi(SpriteBatch sb){
+        sb.draw(gameover, camera.position.x - gameover.getWidth() / 2, camera.position.y);
+    }
+
     @Override
     public void dispose() {
         bg.dispose();
-        snake.dispose();
-        System.out.println("PlayState Disposed");
+//        snake.dispose();
     }
 }

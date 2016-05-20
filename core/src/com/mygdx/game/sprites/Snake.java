@@ -22,7 +22,7 @@ public class Snake {
     private TextureRegion texture_tail;
     private float scale = 0.04f;
     private float angle = -3f;
-    public float speed = 2.5f;
+    public float speed = 3f;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
 
     public Snake(int x, int y){
@@ -87,10 +87,6 @@ public class Snake {
         bounds.setRotation(part.rotation);
         bounds.setOrigin(width/2, height/2);
         return bounds;
-    }
-
-
-    public void dispose() {
     }
 
     public float getWidth(SnakePart.TextureType type){
@@ -169,5 +165,8 @@ public class Snake {
                 return true;
         }
         return false;
+    }
+
+    public void dispose() {
     }
 }
