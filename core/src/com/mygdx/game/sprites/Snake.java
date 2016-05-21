@@ -21,21 +21,25 @@ public class Snake {
     private TextureRegion texture_body;
     private TextureRegion texture_tail;
     private float scale = 0.04f;
-    private float angle = -3f;
-    public float speed = 3f;
+    public float speed;
+    private float angle;
+    private float motion;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
 
-    public Snake(int x, int y){
+    public Snake(int x, int y, float speed){
+        this.speed = speed;
+        angle = -3f * speed;
+        motion = 3f * speed;
         texture_head = new TextureRegion(new Texture("snake_head.png"));
         texture_body = new TextureRegion(new Texture("snake_body.png"));
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         position = new Vector3(x, y, 0);
         parts.add(new SnakePart(position, SnakePart.TextureType.head, 0f, 1f));
-        for (int i = 1; i <= 50; i++)
-            parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0f),
+        for (int i = 1; i <= 50 / speed; i++)
+            parts.add(new SnakePart(new Vector3(position.x-parts.size()* motion, position.y, 0f),
                     SnakePart.TextureType.body, 0f, 1f));
-        parts.add(new SnakePart(new Vector3(position.x-parts.size()*speed, position.y, 0f),
+        parts.add(new SnakePart(new Vector3(position.x-parts.size()* motion, position.y, 0f),
                     SnakePart.TextureType.tail, 0f, 1f));
     }
 
@@ -122,7 +126,7 @@ public class Snake {
     }
 
     private Vector3 move(){
-        return new Vector3(direction.x * speed, direction.y * speed, 0);
+        return new Vector3(direction.x * motion, direction.y * motion, 0);
     }
 
     public void advance() {
@@ -138,6 +142,8 @@ public class Snake {
         for (int i = len; i > 0; i--){
             SnakePart before = parts.get(i-1);
             SnakePart part = parts.get(i);
+            if (part.position.idt(before.position))
+                continue;
             part.position.x = before.position.x;
             part.position.y = before.position.y;
             part.position.z = before.position.z;
@@ -151,8 +157,8 @@ public class Snake {
         if (parts.size() < 2)
             return;
         SnakePart end = parts.get(1);
-        for(int i = 0; i < 10; i++)
-            parts.add(parts.indexOf(end), new SnakePart(new Vector3(end.position.x, end.position.y,
+        for(int i = 0; i < 10 / speed; i++)
+            parts.add(parts.indexOf(end)+1, new SnakePart(new Vector3(end.position.x, end.position.y,
                     end.position.z), end.type, end.rotation, 1.5f));
     }
 

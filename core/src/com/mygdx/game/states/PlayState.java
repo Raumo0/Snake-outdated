@@ -1,22 +1,11 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.World;
-import com.mygdx.game.sprites.Enemy;
 import com.mygdx.game.GameMain;
-import com.mygdx.game.input.Command;
-import com.mygdx.game.input.Switch;
-import com.mygdx.game.input.TurnLeftCommand;
-import com.mygdx.game.input.TurnRightCommand;
-import com.mygdx.game.sprites.Snake;
-import com.mygdx.game.sprites.SnakePart;
-import java.util.Random;
 
 /**
  * Created by raumo0 on 18.4.16.
@@ -35,7 +24,6 @@ public class PlayState extends State {
     private Texture numbers;
     private Texture gameover;
     private World world;
-    private Switch action;
     private int oldScore = 0;
     private String score = "0";
 
@@ -48,34 +36,11 @@ public class PlayState extends State {
         numbers = new Texture("numbers.png");
         gameover = new Texture("gameover.png");
         world = new World();
-        Command switchLeft = new TurnLeftCommand(world.snake);
-        Command switchRight = new TurnRightCommand(world.snake);
-        action = new Switch(switchLeft, switchRight);
     }
 
     @Override
     protected void handleInput() {
-        int centre = Gdx.graphics.getWidth() / 2;
-        if (Gdx.input.isTouched(0)) {
-            if (Gdx.input.getX(0) > centre) {
-                action.turnRight();
-            }
-            else if (Gdx.input.getX(0) <= centre) {
-                action.turnLeft();
-            }
-        }
-        if (Gdx.input.isTouched(1)) {
-            if (Gdx.input.getX(1) > centre && Gdx.input.getX(0) <= centre) {
-                action.turnRight();
-            }
-            else if (Gdx.input.getX(1) <= centre && Gdx.input.getX(0) > centre) {
-                action.turnLeft();
-            }
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            action.turnRight();
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            action.turnLeft();
+
     }
 
     @Override
@@ -90,6 +55,7 @@ public class PlayState extends State {
     }
 
     private void updateRunning(float dt){
+        world.useAI = false;
         for (int i = 0; i < 5; i++)
             if (Gdx.input.isTouched(i) &&
                     Gdx.input.getX(i) > Gdx.graphics.getWidth()-Gdx.graphics.getWidth()/5 &&
@@ -97,7 +63,6 @@ public class PlayState extends State {
                 state = GameState.Paused;
                 return;
             }
-        handleInput();
         world.update(dt);
         if (world.gameOver)
             state = GameState.GameOver;

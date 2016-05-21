@@ -1,10 +1,15 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.input.Command;
+import com.mygdx.game.input.Switch;
+import com.mygdx.game.input.TurnLeftCommand;
+import com.mygdx.game.input.TurnRightCommand;
 import com.mygdx.game.sprites.Snake;
 import com.mygdx.game.sprites.Enemy;
 import com.mygdx.game.sprites.SnakePart;
@@ -22,18 +27,25 @@ public class World {
     private int scoreIncrement = 1;
     private Random random = new Random();
     private float tickTime = 0f;
-    private float tick = 0.016f;
+    private float tick = 0.032f;
+    private Switch action;
+    public boolean useAI = false;
 
     public World() {
-        snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2);
+        snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2);
         enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
                 random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"));
+        Command switchLeft = new TurnLeftCommand(snake);
+        Command switchRight = new TurnRightCommand(snake);
+        action = new Switch(switchLeft, switchRight);
     }
 
     public void update(float dt) {
         tickTime += dt;
         while (tickTime > tick) {
             tickTime -= tick;
+            if (!useAI)
+                handleInput();
             snake.advance();
             if (snake.checkBitten()) {
                 Gdx.input.vibrate(200);
@@ -70,8 +82,7 @@ public class World {
                 snake.getWidth(part.type), snake.getHeight(part.type),
                 scale * snake.getScaleX(part), scale * snake.getScaleY(part), part.rotation);
         scale = 1f;
-        float excess = .6f * snake.getWidth(SnakePart.TextureType.tail) / snake.speed;
-        for (int i = 5; i < snake.parts.size()-excess; i++){
+        for (int i = 1; i < snake.parts.size(); i++){
             part = snake.parts.get(i);
             sb.draw(snake.getTexture(part.type),
                     part.position.x - snake.getWidth(part.type)/2,
@@ -90,6 +101,30 @@ public class World {
                 scale * snake.getScaleX(part), .9f * snake.getScaleY(part), part.rotation);
 
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
+    }
+
+    private void handleInput() {
+        int centre = Gdx.graphics.getWidth() / 2;
+        if (Gdx.input.isTouched(0)) {
+            if (Gdx.input.getX(0) > centre) {
+                action.turnRight();
+            }
+            else if (Gdx.input.getX(0) <= centre) {
+                action.turnLeft();
+            }
+        }
+        if (Gdx.input.isTouched(1)) {
+            if (Gdx.input.getX(1) > centre && Gdx.input.getX(0) <= centre) {
+                action.turnRight();
+            }
+            else if (Gdx.input.getX(1) <= centre && Gdx.input.getX(0) > centre) {
+                action.turnLeft();
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            action.turnRight();
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            action.turnLeft();
     }
 
     public void dispose() {
