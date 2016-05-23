@@ -32,7 +32,7 @@ public class World {
     public boolean useAI = false;
 
     public World() {
-        snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2);
+        snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2, -4.5f, 3f);
         enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
                 random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"));
         Command switchLeft = new TurnLeftCommand(snake);
@@ -75,6 +75,7 @@ public class World {
     public void draw(SpriteBatch sb){
         float scale = 1.5f;
         SnakePart part = snake.parts.get(0);
+        sb.begin();
         sb.draw(snake.getTexture(part.type),
                 part.position.x - snake.getWidth(part.type)/2,
                 part.position.y - snake.getHeight(part.type)/2,
@@ -101,6 +102,7 @@ public class World {
                 scale * snake.getScaleX(part), .9f * snake.getScaleY(part), part.rotation);
 
         sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
+        sb.end();
     }
 
     private void handleInput() {

@@ -23,23 +23,25 @@ public class Snake {
     private float scale = 0.04f;
     public float speed;
     private float angle;
-    private float motion;
+    private float strideLength;
     public List<SnakePart> parts = new ArrayList<SnakePart>();
+    private float turnAcceleration;
 
-    public Snake(int x, int y, float speed){
+    public Snake(int x, int y, float speed, float angle, float strideLength){
         this.speed = speed;
-        angle = -3f * speed;
-        motion = 3f * speed;
+        this.angle = angle * speed;
+        this.strideLength = strideLength * speed;
+        turnAcceleration = .2f;
         texture_head = new TextureRegion(new Texture("snake_head.png"));
         texture_body = new TextureRegion(new Texture("snake_body.png"));
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         position = new Vector3(x, y, 0);
         parts.add(new SnakePart(position, SnakePart.TextureType.head, 0f, 1f));
-        for (int i = 1; i <= 50 / speed; i++)
-            parts.add(new SnakePart(new Vector3(position.x-parts.size()* motion, position.y, 0f),
+        for (int i = 1; i <= 50 / this.speed; i++)
+            parts.add(new SnakePart(new Vector3(position.x-parts.size()* this.strideLength, position.y, 0f),
                     SnakePart.TextureType.body, 0f, 1f));
-        parts.add(new SnakePart(new Vector3(position.x-parts.size()* motion, position.y, 0f),
+        parts.add(new SnakePart(new Vector3(position.x-parts.size()* this.strideLength, position.y, 0f),
                     SnakePart.TextureType.tail, 0f, 1f));
     }
 
@@ -56,12 +58,14 @@ public class Snake {
         float route = -angle;
         direction = turn(direction, route);
         roundAngle(route);
+        position.add(move(turnAcceleration));
     }
 
     public void turnRight(){
         float route = angle;
         direction = turn(direction, route);
         roundAngle(route);
+        position.add(move(turnAcceleration));
     }
 
     private Vector3 turn(Vector3 vector, float route){
@@ -125,8 +129,9 @@ public class Snake {
         return part.scale * texture_head.getRegionHeight() / texture_tail.getRegionHeight();
     }
 
-    private Vector3 move(){
-        return new Vector3(direction.x * motion, direction.y * motion, 0);
+    private Vector3 move(float acceleration){
+        return new Vector3(direction.x * strideLength * acceleration,
+                direction.y * strideLength * acceleration, 0);
     }
 
     public void advance() {
@@ -150,7 +155,7 @@ public class Snake {
             part.rotation = before.rotation;
             part.scale = before.scale;
         }
-        position.add(move());
+        position.add(move(1));
     }
 
     public void eat() {
@@ -165,7 +170,8 @@ public class Snake {
     public boolean checkBitten() {
         int len = parts.size();
         SnakePart head = parts.get(0);
-        for(int i = 1; i < len; i+=10) {
+        float step = getWidth(SnakePart.TextureType.head) / (strideLength * speed);
+        for(int i = 1; i < len; i+=step) {
             SnakePart part = parts.get(i);
             if (Intersector.overlapConvexPolygons(getBounds(head), getBounds(part)))
                 return true;
