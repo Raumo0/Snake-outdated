@@ -30,6 +30,7 @@ public class World {
     private float tick = 0.032f;
     private Switch action;
     public boolean useAI = false;
+    private Texture bg;
 
     public World() {
         snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2, -4.5f, 3f);
@@ -38,6 +39,7 @@ public class World {
         Command switchLeft = new TurnLeftCommand(snake);
         Command switchRight = new TurnRightCommand(snake);
         action = new Switch(switchLeft, switchRight);
+        bg = new Texture("bg3.png");
     }
 
     public void update(float dt) {
@@ -76,6 +78,7 @@ public class World {
         float scale = 1.5f;
         SnakePart part = snake.parts.get(0);
         sb.begin();
+        sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
         sb.draw(snake.getTexture(part.type),
                 part.position.x - snake.getWidth(part.type)/2,
                 part.position.y - snake.getHeight(part.type)/2,
@@ -130,6 +133,6 @@ public class World {
     }
 
     public void dispose() {
-
+        bg.dispose();
     }
 }

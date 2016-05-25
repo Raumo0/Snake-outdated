@@ -51,6 +51,18 @@ public class MenuState extends State {
                 }
             }
         });
+        highscoresBtn.addListener(new InputListener() {
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                Gdx.app.log("highscores", "Pressed");
+                return true;
+            }
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                if (x > 0 && x < playBtn.getWidth() && y > 0 && y < playBtn.getHeight()) {
+                    Gdx.app.log("highscores", "Released");
+                    gsm.set(new HighscoresState(gsm));
+                }
+            }
+        });
         table.setWidth(Gdx.graphics.getWidth()/2);
         table.setHeight(Gdx.graphics.getHeight()/2);
         table.setPosition(Gdx.graphics.getWidth()/2 - table.getWidth()/2,

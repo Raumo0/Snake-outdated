@@ -24,9 +24,7 @@ public class PlayState extends State {
         GameOver
     }
     private GameState state = GameState.Running;
-    private Texture bg;
     private Texture buttons;
-    private Texture pause;
     private Texture numbers;
     private Texture gameover;
     private World world;
@@ -41,9 +39,7 @@ public class PlayState extends State {
     public PlayState(final GameStateManager gsm) {
         super(gsm);
         camera.setToOrtho(false, GameMain.WIDTH , GameMain.HEIGHT );
-        bg = new Texture("bg3.png");
         buttons = new Texture("buttons.png");
-        pause = new Texture("pausemenu.png");
         numbers = new Texture("numbers.png");
         gameover = new Texture("gameover.png");
         world = new World();
@@ -51,7 +47,6 @@ public class PlayState extends State {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
         table = new Table();
-        table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         table.debug();
 
         Texture menu = new Texture("pausemenu.png");
@@ -83,8 +78,7 @@ public class PlayState extends State {
                 }
             }
         });
-        table.setWidth(Gdx.graphics.getWidth()/2);
-        table.setHeight(Gdx.graphics.getHeight()/2);
+        table.setSize(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
         table.setPosition(Gdx.graphics.getWidth()/2 - table.getWidth()/2,
                 Gdx.graphics.getHeight()/2 - table.getHeight()/2);
         table.add(resumeBtn).expand().width(table.getWidth()).height(table.getHeight()/4);//.width(image2.getRegionWidth()).height(image2.getRegionHeight());
@@ -131,14 +125,6 @@ public class PlayState extends State {
     }
 
     private void updatePaused(){
-//        for (int i = 0; i < 5; i++)
-//            if (Gdx.input.isTouched(i) && Gdx.input.getX(i) > Gdx.graphics.getWidth()/2-200 &&
-//                Gdx.input.getX(i) < Gdx.graphics.getWidth()/2+200 &&
-//                Gdx.input.getY(i) > Gdx.graphics.getHeight()/2-200 &&
-//                Gdx.input.getY(i) < Gdx.graphics.getHeight()/2+200) {
-//            state = GameState.Running;
-//            return;
-//        }
     }
 
     private void updateGameOver(){
@@ -149,9 +135,6 @@ public class PlayState extends State {
     @Override
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(camera.combined);
-        sb.begin();
-        sb.draw(bg, 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
-        sb.end();
         world.draw(sb);
         if (state == GameState.Ready);
         if (state == GameState.Running)
@@ -162,11 +145,11 @@ public class PlayState extends State {
             drawGameOverUi(sb);
 
         sb.begin();
-        drawText(sb, score, GameMain.WIDTH/2 - score.length()*20/2, GameMain.HEIGHT - 42);
+        drawScore(sb, score, GameMain.WIDTH/2 - score.length()*20/2, GameMain.HEIGHT - 42);
         sb.end();
     }
 
-    private void drawText(SpriteBatch sb, String line, int x, int y){
+    private void drawScore(SpriteBatch sb, String line, int x, int y){
         int len = line.length();
         for (int i = 0; i < len; i++) {
             char character = line.charAt(i);
@@ -176,8 +159,8 @@ public class PlayState extends State {
                 continue;
             }
 
-            int srcX = 0;
-            int srcWidth = 0;
+            int srcX;
+            int srcWidth;
             if (character == '.') {
                 srcX = 200;
                 srcWidth = 10;
@@ -212,8 +195,8 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-        bg.dispose();
         stage.dispose();
         table.remove();
+        world.dispose();
     }
 }
