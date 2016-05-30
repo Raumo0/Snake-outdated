@@ -10,15 +10,17 @@ public class SnakePart {
     public float rotation = 0f;
     public final TextureType type;
     public float scale;
+    public boolean dive;
     public enum TextureType {
         head, body, tail
     }
 
-    public SnakePart(Vector3 position, TextureType type, float rotation, float scale){
+    public SnakePart(Vector3 position, TextureType type, float rotation, float scale, boolean dive){
         this.position = position;
         this.rotation = rotation;
         this.type = type;
         this.scale = scale;
+        this.dive = dive;
     }
 
     public void dispose(){

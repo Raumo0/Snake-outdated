@@ -37,12 +37,12 @@ public class Snake {
         texture_tail = new TextureRegion(new Texture("snake_tail.png"));
 //        birdAnimation = new Animation(new TextureRegion(texture_head), 3, 0.5f);
         position = new Vector3(x, y, 0);
-        parts.add(new SnakePart(position, SnakePart.TextureType.head, 0f, 1f));
+        parts.add(new SnakePart(position, SnakePart.TextureType.head, 0f, 1f, true));
         for (int i = 1; i <= 50 / this.speed; i++)
             parts.add(new SnakePart(new Vector3(position.x-parts.size()* this.strideLength, position.y, 0f),
-                    SnakePart.TextureType.body, 0f, 1f));
+                    SnakePart.TextureType.body, 0f, 1f, true));
         parts.add(new SnakePart(new Vector3(position.x-parts.size()* this.strideLength, position.y, 0f),
-                    SnakePart.TextureType.tail, 0f, 1f));
+                    SnakePart.TextureType.tail, 0f, 1f, true));
     }
 
     public TextureRegion getTexture(SnakePart.TextureType type){
@@ -66,6 +66,10 @@ public class Snake {
         direction = turn(direction, route);
         roundAngle(route);
         position.add(move(turnAcceleration));
+    }
+
+    public void diveChange(){
+        parts.get(0).dive = !parts.get(0).dive;
     }
 
     private Vector3 turn(Vector3 vector, float route){
@@ -154,6 +158,7 @@ public class Snake {
             part.position.z = before.position.z;
             part.rotation = before.rotation;
             part.scale = before.scale;
+            part.dive = before.dive;
         }
         position.add(move(1));
     }
@@ -164,7 +169,7 @@ public class Snake {
         SnakePart end = parts.get(1);
         for(int i = 0; i < 10 / speed; i++)
             parts.add(parts.indexOf(end)+1, new SnakePart(new Vector3(end.position.x, end.position.y,
-                    end.position.z), end.type, end.rotation, 1.5f));
+                    end.position.z), end.type, end.rotation, 1.5f, end.dive));
     }
 
     public boolean checkBitten() {
@@ -173,7 +178,8 @@ public class Snake {
         float step = getWidth(SnakePart.TextureType.head) / (strideLength * speed);
         for(int i = 1; i < len; i+=step) {
             SnakePart part = parts.get(i);
-            if (Intersector.overlapConvexPolygons(getBounds(head), getBounds(part)))
+            if (head.dive == part.dive &&
+                    Intersector.overlapConvexPolygons(getBounds(head), getBounds(part)))
                 return true;
         }
         return false;

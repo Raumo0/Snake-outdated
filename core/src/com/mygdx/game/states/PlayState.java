@@ -1,6 +1,7 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -110,6 +111,8 @@ public class PlayState extends State {
                     Gdx.input.getY(i) < Gdx.graphics.getHeight()/7) {
                 state = GameState.Paused;
                 stage.addActor(table);
+                if (Gdx.input.getInputProcessor() != stage)
+                    Gdx.input.setInputProcessor(stage);
                 return;
             }
         world.update(dt);
