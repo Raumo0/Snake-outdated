@@ -62,13 +62,6 @@ public class World {
                 }
                 return false;
             }
-            public boolean touchDown(float x, float y, int pointer, int button) {
-                if (x < leftButtonEdge){
-                    action.turnLeft();
-                    Gdx.app.log("turn left", "long press");
-                }
-                return false;
-            }
         };
         gestureDetector = new GestureDetector(myGestureListener);
         im = new InputMultiplexer(Gdx.input.getInputProcessor(), gestureDetector);
@@ -79,7 +72,7 @@ public class World {
         while (tickTime > tick) {
             tickTime -= tick;
             if (!useAI) {
-//                handleInput();
+                handleInput();
                 Gdx.input.setInputProcessor(im);
             }
             snake.advance();
