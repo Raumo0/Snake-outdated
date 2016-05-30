@@ -157,7 +157,10 @@ public class Snake {
             part.position.y = before.position.y;
             part.position.z = before.position.z;
             part.rotation = before.rotation;
-            part.scale = before.scale;
+            if (part.type == SnakePart.TextureType.tail)
+                part.scale = parts.get(0).scale;
+            else
+                part.scale = before.scale;
             part.dive = before.dive;
         }
         position.add(move(1));
