@@ -2,16 +2,15 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.input.Command;
 import com.mygdx.game.input.DiveChangeCommand;
-import com.mygdx.game.input.MyGestureListener;
 import com.mygdx.game.input.Switch;
 import com.mygdx.game.input.TurnLeftCommand;
 import com.mygdx.game.input.TurnRightCommand;
@@ -36,10 +35,12 @@ public class World {
     private Switch action;
     public boolean useAI = false;
     private Sprite bg;
-    private GestureDetector gestureDetector;
     private float leftButtonEdge;
     private float rightButtonEdge;
-    private InputMultiplexer im;
+    private boolean turnLeft = false;
+    private boolean turnRight = false;
+    private boolean dive = false;
+    private ShapeRenderer shapeDebugger = new ShapeRenderer();
 
     public World() {
         snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2, -4.5f, 3f);
@@ -52,28 +53,26 @@ public class World {
         bg = new Sprite(new Texture("bg3.png"), 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
         leftButtonEdge = Gdx.graphics.getWidth() * 2 / 5;
         rightButtonEdge = Gdx.graphics.getWidth() * 3 / 5;
-
-
-        MyGestureListener myGestureListener = new MyGestureListener() {
-            public boolean tap(float x, float y, int count, int button) {
-                if (x > leftButtonEdge && x < rightButtonEdge) {
-                    action.diveChange();
-                    Gdx.app.log("Dive ", "TAP");
-                }
-                return false;
-            }
-        };
-        gestureDetector = new GestureDetector(myGestureListener);
-        im = new InputMultiplexer(Gdx.input.getInputProcessor(), gestureDetector);
     }
 
     public void update(float dt) {
+        if (!useAI) {
+            handleInput();
+        }
         tickTime += dt;
         while (tickTime > tick) {
             tickTime -= tick;
-            if (!useAI) {
-                handleInput();
-                Gdx.input.setInputProcessor(im);
+            if (turnRight){
+                action.turnRight();
+                turnRight = false;
+            }
+            if (turnLeft){
+                action.turnLeft();
+                turnLeft = false;
+            }
+            if (dive){
+                action.diveChange();
+                dive = false;
             }
             snake.advance();
             if (snake.checkBitten()) {
@@ -87,13 +86,13 @@ public class World {
                 placeEnemy();
             }
         }
-//        Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
-//        Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
-//        Gdx.app.log("Distance: ", String.valueOf(
-//                snake.parts.get(0).position.dst(snake.parts.get(1).position)));
-//        Gdx.app.log("Part width: ", String.valueOf(snake.getWidth(SnakePart.TextureType.head)));
-//        Gdx.app.log("Native heap(Mb): ", String.valueOf(Gdx.app.getNativeHeap()/(1024*1024)));
-//        Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
+        Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
+        Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
+        Gdx.app.log("Distance: ", String.valueOf(
+                snake.parts.get(0).position.dst(snake.parts.get(1).position)));
+        Gdx.app.log("Part width: ", String.valueOf(snake.getWidth(SnakePart.TextureType.head)));
+        Gdx.app.log("Native heap(Mb): ", String.valueOf(Gdx.app.getNativeHeap()/(1024*1024)));
+        Gdx.app.log("Java heap(Mb): ", String.valueOf(Gdx.app.getJavaHeap()/(1024*1024)));
     }
 
     private void placeEnemy() {
@@ -107,6 +106,11 @@ public class World {
         sb.begin();
         bg.draw(sb, .9f);
         sb.end();
+        shapeDebugger.begin(ShapeRenderer.ShapeType.Line);
+        shapeDebugger.setColor(Color.GRAY);
+        shapeDebugger.line(leftButtonEdge, 0, leftButtonEdge, Gdx.graphics.getHeight());
+        shapeDebugger.line(rightButtonEdge, 0, rightButtonEdge, Gdx.graphics.getHeight());
+        shapeDebugger.end();
 
         snakeDraw(sb, false);
 
@@ -154,29 +158,47 @@ public class World {
     }
 
     private void handleInput() {
+        boolean one = false;
+        boolean two = false;
         if (Gdx.input.isTouched(0)) {
             if (Gdx.input.getX(0) >= rightButtonEdge) {
-                action.turnRight();
+                turnRight = true;
+                one = true;
             }
             else if (Gdx.input.getX(0) <= leftButtonEdge) {
-                action.turnLeft();
+                turnLeft = true;
+                one = true;
             }
         }
         if (Gdx.input.isTouched(1)) {
             if (Gdx.input.getX(1) >= rightButtonEdge && Gdx.input.getX(0) < rightButtonEdge) {
-                action.turnRight();
+                turnRight = true;
+                two = true;
             }
             else if (Gdx.input.getX(1) <= leftButtonEdge && Gdx.input.getX(0) > leftButtonEdge) {
-                action.turnLeft();
+                turnLeft = true;
+                two = true;
+            }
+        }
+        if (Gdx.input.justTouched()) {
+            int x;
+            int n;
+            if (!one) n = 0;
+            else if (!two)
+                n = 1 ;
+            else n = 2;
+            x = Gdx.input.getX(n);
+            if (Gdx.input.isTouched(n) && x > leftButtonEdge && x < rightButtonEdge) {
+                dive = true;
             }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            action.turnRight();
+            turnRight = true;
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            action.turnLeft();
+            turnLeft = true;
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            action.diveChange();
+            dive = true;
         }
     }
 
