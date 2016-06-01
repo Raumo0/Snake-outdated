@@ -6,18 +6,23 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pools;
 import com.mygdx.game.input.Command;
 import com.mygdx.game.input.DiveChangeCommand;
 import com.mygdx.game.input.Switch;
 import com.mygdx.game.input.TurnLeftCommand;
 import com.mygdx.game.input.TurnRightCommand;
+import com.mygdx.game.sprites.EnemyPool;
 import com.mygdx.game.sprites.Snake;
 import com.mygdx.game.sprites.Enemy;
 import com.mygdx.game.sprites.SnakePart;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,7 +30,7 @@ import java.util.Random;
  */
 public class World {
     public Snake snake;
-    public Enemy enemy;
+//    public Enemy enemy;
     public boolean gameOver = false;
     public int score = 0;
     private int scoreIncrement = 1;
@@ -44,11 +49,19 @@ public class World {
     public float hungerLimit;
     public float hunger;
     public int lives;
+    private List<Enemy> enemies = new ArrayList<Enemy>();
+    private EnemyPool enemyPool = new EnemyPool();
+    private TextureRegion textureEnemy;
 
     public World() {
         snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2, -4.5f, 3f);
-        enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
-                random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"));
+//        enemy = new Enemy(new Vector3(random.nextInt(GameMain.WIDTH - 50),
+//                random.nextInt(GameMain.HEIGHT - 50),0), new Texture("bird.png"), 1, 1, false);
+        textureEnemy = new TextureRegion(new Texture("bird.png"));
+        enemies.add(createEnemy(textureEnemy, false, 1, 0, new Vector3(random.nextInt(GameMain.WIDTH - 50),
+                random.nextInt(GameMain.HEIGHT - 50),0)));
+
+
         Command switchLeft = new TurnLeftCommand(snake);
         Command switchRight = new TurnRightCommand(snake);
         Command switchDive = new DiveChangeCommand(snake);
@@ -98,12 +111,20 @@ public class World {
                 gameOver = true;
             }
             SnakePart head = snake.parts.get(0);
-            if (Intersector.overlapConvexPolygons(enemy.getBounds(),snake.getBounds(head))) {
-                score += scoreIncrement;
-                snake.eat();
-                placeEnemy();
-                hunger = hungerLimit;
+            for (Enemy enemy : enemies) {
+                if (enemy.dive != head.dive)
+                    continue;
+                if (Intersector.overlapConvexPolygons(enemy.getBounds(), snake.getBounds(head))) {
+                    score += scoreIncrement;
+                    snake.eat();
+                    enemies.remove(enemy);
+                    hunger = hungerLimit;
+                    break;
+                }
             }
+            if (enemies.size() < 3)
+                for (int i = 0; i < random.nextInt(5); i++)
+                    placeEnemy();
         }
         Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
         Gdx.app.log("Snake parts count: ", String.valueOf(snake.parts.size()));
@@ -115,11 +136,17 @@ public class World {
     }
 
     private void placeEnemy() {
-        enemy.position.x = random.nextInt(GameMain.WIDTH - 50);
-        enemy.position.y = random.nextInt(GameMain.HEIGHT - 50);
+//        enemy.position.x = random.nextInt(GameMain.WIDTH - 50);
+//        enemy.position.y = random.nextInt(GameMain.HEIGHT - 50);
+        enemies.add(createEnemy(textureEnemy, random.nextBoolean(), 1, 0,
+                new Vector3(random.nextInt(GameMain.WIDTH - 100)+50,
+                random.nextInt(GameMain.HEIGHT - 100)+50,0)));
+//        createEnemy(TextureRegion texture, boolean dive, float scale, float rotation,
+//        Vector3 position)
     }
 
     public void draw(SpriteBatch sb){
+        enemyDraw(sb, true);
         snakeDraw(sb, true);
 
         sb.begin();
@@ -131,10 +158,29 @@ public class World {
         shapeDebugger.line(rightButtonEdge, 0, rightButtonEdge, Gdx.graphics.getHeight());
         shapeDebugger.end();
 
+        enemyDraw(sb, false);
         snakeDraw(sb, false);
 
+//        sb.begin();
+//        for (Enemy enemy: enemies)
+//            sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
+//        sb.end();
+    }
+
+    private void enemyDraw(SpriteBatch sb, boolean dive){
         sb.begin();
-        sb.draw(enemy.texture, enemy.position.x, enemy.position.y);
+        for (Enemy enemy : enemies){
+            if (enemy.dive == dive)
+                sb.draw(enemy.texture,
+                        enemy.position.x - enemy.scale * enemy.texture.getRegionWidth() / 2,
+                        enemy.position.y - enemy.scale * enemy.texture.getRegionHeight() / 2,
+                        enemy.scale*enemy.texture.getRegionWidth()/2,
+                        enemy.scale*enemy.texture.getRegionHeight()/2,
+                        enemy.scale*enemy.texture.getRegionWidth(),
+                        enemy.scale*enemy.texture.getRegionHeight(),
+                        enemy.scale, enemy.scale, enemy.rotation
+                );
+        }
         sb.end();
     }
 
@@ -219,6 +265,17 @@ public class World {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             dive = true;
         }
+    }
+
+    private Enemy createEnemy(TextureRegion texture, boolean dive, float scale, float rotation,
+                              Vector3 position){
+        Enemy enemy = enemyPool.obtain();
+        enemy.texture = texture;
+        enemy.dive = dive;
+        enemy.scale = scale;
+        enemy.rotation = rotation;
+        enemy.position = position;
+        return enemy;
     }
 
     public void dispose() {
