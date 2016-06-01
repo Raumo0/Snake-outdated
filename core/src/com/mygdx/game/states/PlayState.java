@@ -152,7 +152,9 @@ public class PlayState extends State {
             drawGameOverUi(sb);
 
         sb.begin();
-        drawScore(sb, score, GameMain.WIDTH/2 - score.length()*20/2, GameMain.HEIGHT - 42);
+        drawScore(sb, score, 2*GameMain.WIDTH/3 - score.length()*20/2, GameMain.HEIGHT - 42);
+        drawScore(sb, String.valueOf(world.hunger), GameMain.WIDTH/5 - score.length()*20/2, GameMain.HEIGHT - 42);
+        drawScore(sb, String.valueOf(world.lives), 0, GameMain.HEIGHT - 42);
         sb.end();
     }
 

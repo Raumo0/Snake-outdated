@@ -41,6 +41,9 @@ public class World {
     private boolean turnRight = false;
     private boolean dive = false;
     private ShapeRenderer shapeDebugger = new ShapeRenderer();
+    public float hungerLimit;
+    public float hunger;
+    public int lives;
 
     public World() {
         snake = new Snake(GameMain.WIDTH / 2, GameMain.HEIGHT / 2, 2, -4.5f, 3f);
@@ -53,12 +56,24 @@ public class World {
         bg = new Sprite(new Texture("bg3.png"), 0, 0, GameMain.WIDTH, GameMain.HEIGHT);
         leftButtonEdge = Gdx.graphics.getWidth() * 2 / 5;
         rightButtonEdge = Gdx.graphics.getWidth() * 3 / 5;
+        hungerLimit = 20;
+        hunger = hungerLimit;
+        lives = 3;
     }
 
     public void update(float dt) {
         if (!useAI) {
             handleInput();
         }
+        hunger -= dt;
+        if (hunger <= 0) {
+            Gdx.input.vibrate(1000);
+            lives--;
+            if (lives != 0)
+                hunger = hungerLimit;
+        }
+        if (lives <= 0)
+            gameOver = true;
         tickTime += dt;
         while (tickTime > tick) {
             tickTime -= tick;
@@ -77,6 +92,9 @@ public class World {
             snake.advance();
             if (snake.checkBitten()) {
                 Gdx.input.vibrate(200);
+//                lives--;
+//                if (lives != 0)
+//                    hunger = hungerLimit;
                 gameOver = true;
             }
             SnakePart head = snake.parts.get(0);
@@ -84,6 +102,7 @@ public class World {
                 score += scoreIncrement;
                 snake.eat();
                 placeEnemy();
+                hunger = hungerLimit;
             }
         }
         Gdx.app.log("FPS: ", String.valueOf(Gdx.graphics.getFramesPerSecond()));
