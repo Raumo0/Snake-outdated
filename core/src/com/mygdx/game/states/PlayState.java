@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.mygdx.game.Settings;
 import com.mygdx.game.World;
 import com.mygdx.game.GameMain;
 
@@ -131,8 +132,11 @@ public class PlayState extends State {
     }
 
     private void updateGameOver(){
-        if (Gdx.input.justTouched())
+        if (Gdx.input.justTouched()) {
+            Settings.addScore(world.score);
+            Settings.save();
             gsm.set(new MenuState(gsm));
+        }
     }
 
     @Override

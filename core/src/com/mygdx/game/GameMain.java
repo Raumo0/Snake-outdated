@@ -33,6 +33,7 @@ public class GameMain extends Game {
 //		music.setVolume(0.1f);
 //		music.play();
 		Gdx.gl.glClearColor(1, 1, 1, 0);
+		Settings.load();
 		gsm.push(new MenuState(gsm));
 	}
 
