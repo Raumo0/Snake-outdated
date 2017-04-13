@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "23.0.2"
-    compileSdkVersion 23
+    buildToolsVersion "25.0.2"
+    compileSdkVersion 25
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -14,10 +14,13 @@ android {
 
         instrumentTest.setRoot('tests')
     }
+    packagingOptions {
+        exclude 'META-INF/robovm/ios/robovm.xml'
+    }
     defaultConfig {
-        applicationId "com.mygdx.game"
-        minSdkVersion 8
-        targetSdkVersion 23
+        applicationId "com.raumo0.snake"
+        minSdkVersion 9
+        targetSdkVersion 25
     }
 }
 
@@ -68,7 +71,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.mygdx.game/com.mygdx.game.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.raumo0.snake/com.raumo0.snake.AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.
